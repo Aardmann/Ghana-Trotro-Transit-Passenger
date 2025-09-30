@@ -1,0 +1,7 @@
+[
+  { "from": "Agbogba", "to": "Madina", "fare": 6 },
+  { "from": "Madina", "to": "Tema", "fare": 20 },
+  { "from": "Madina", "to": "Accra Mall", "fare": 8 },
+  { "from": "Accra Mall", "to": "Circle", "fare": 10 },
+  { "from": "Circle", "to": "Tema", "fare": 25 }
+]
