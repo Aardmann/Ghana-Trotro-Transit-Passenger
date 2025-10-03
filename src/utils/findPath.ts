@@ -68,11 +68,12 @@ export function findBestPath(
     // Found destination
     if (current.stop === end) {
       return {
-        path: current.path,
-        legs: current.legs,
-        totalFare: current.fare,
-        totalDistance: current.distance
-      };
+  path: current.path,
+  legs: current.legs,
+  totalFare: current.fare,
+  totalDistance: current.distance,
+  totalStops: current.stopsCount
+};
     }
 
     // Expand neighbors across all routes (consider both directions)

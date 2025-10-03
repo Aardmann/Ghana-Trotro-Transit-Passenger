@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
@@ -15,7 +15,6 @@ function FitBounds({ coords }: { coords: LatLng[] }) {
   useEffect(() => {
     if (!coords || coords.length === 0) return;
     // convert to LatLng tuples
-    // @ts-ignore
     map.fitBounds(coords, { padding: [50, 50] });
   }, [map, coords]);
   return null;
@@ -78,7 +77,7 @@ export default function MapView({ stopsCoords, useRoadRouting = false }: MapView
 
       {/* road line if available, otherwise straight connections */}
       {roadLine && roadLine.length > 1 ? (
-        <Polyline positions={roadLine} color="purple" weight={5} opacity={0.9} />
+        <Polyline positions={roadLine} color="purple" weight={20} opacity={0.9} />
       ) : (
         stopsCoords.length > 1 && <Polyline positions={stopsCoords} color="purple" weight={4} />
       )}

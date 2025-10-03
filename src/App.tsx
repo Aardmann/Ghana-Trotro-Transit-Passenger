@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Stop, Route, PathResult } from "./types";
 import { findBestPath } from "./utils/findBestPath";
 import MapView from "./components/MapView";
@@ -11,13 +11,13 @@ export default function App() {
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>("");
   const [priority, setPriority] = useState<"fare" | "distance" | "stops">("fare");
-  const [result, setResult] = useState<PathResult | null>(null);
+  const [, setResult] = useState<PathResult | null>(null);
   const [coordsPath, setCoordsPath] = useState<[number, number][]>([]);
   const [useRoadRouting, setUseRoadRouting] = useState<boolean>(false);
 
   // ✅ NEW states for multiple routes
   const [matchingRoutes, setMatchingRoutes] = useState<Route[]>([]);
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
   // ✅ Fetch stops and routes from Supabase
   useEffect(() => {
@@ -115,8 +115,7 @@ export default function App() {
 };
 
 
-// ✅ New state to hold per-leg fares
-const [legFares, setLegFares] = useState<
+const [, setLegFares] = useState<
   { from: string; to: string; fare: number }[]
 >([]);
 
@@ -126,7 +125,7 @@ useEffect(() => {
   const computeLegFares = async () => {
     if (!selectedRouteId) return;
 
-    const route = matchingRoutes.find((r) => r.id === selectedRouteId);
+    const route = matchingRoutes.find((r) => (r.id) === selectedRouteId);
     if (!route) return;
 
     const stopSeq = [route.from, ...(route.intermediates?.map((i) => i.name) ?? []), route.to];
@@ -165,7 +164,7 @@ const handleFind = () => {
 
   if (matches.length) {
     const firstRoute = matches[0];
-    setSelectedRouteId(firstRoute.id);
+    setSelectedRouteId((firstRoute.id));
 
     const coords: [number, number][] = [];
     coords.push(firstRoute.fromCoords);
@@ -193,16 +192,33 @@ const handleFind = () => {
           style={{
             maxWidth: 1100,
             margin: "0 auto",
+            padding: "8px 12px",
             display: "flex",
-            alignItems: "center",
+            flexDirection: "column", // ✅ stack by default
             gap: 12,
           }}
         >
-          <h1 style={{ margin: 0, fontSize: 18 }}>Ghana Trotro Transit</h1>
-          <div style={{ flex: 1 }} />
+          {/* Title */}
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 20,
+              textAlign: "center",
+            }}
+          >
+            Ghana Trotro Transit
+          </h1>
 
-          {/* Controls (unchanged) */}
-          <div className="controls" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {/* Controls */}
+          <div
+            className="controls"
+            style={{
+              display: "flex",
+              flexWrap: "wrap", // ✅ allows wrapping to next line
+              gap: 8,
+              justifyContent: "center",
+            }}
+          >
             {/* From Search */}
             <div style={{ position: "relative" }}>
               <input
@@ -210,7 +226,13 @@ const handleFind = () => {
                 placeholder="From..."
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
-                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc", width: 160 }}
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 8,
+                  border: "1px solid #ccc",
+                  width: 160,
+                  maxWidth: "40vw", // ✅ shrink on small screens
+                }}
               />
               {from && (
                 <ul
@@ -230,7 +252,9 @@ const handleFind = () => {
                   }}
                 >
                   {stopNames
-                    .filter((n) => n.toLowerCase().includes(from.toLowerCase()) && n !== from)
+                    .filter(
+                      (n) => n.toLowerCase().includes(from.toLowerCase()) && n !== from
+                    )
                     .map((n) => (
                       <li
                         key={n}
@@ -251,7 +275,13 @@ const handleFind = () => {
                 placeholder="To..."
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc", width: 160 }}
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 8,
+                  border: "1px solid #ccc",
+                  width: 160,
+                  maxWidth: "40vw",
+                }}
               />
               {to && (
                 <ul
@@ -289,7 +319,12 @@ const handleFind = () => {
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as any)}
-              style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc" }}
+              style={{
+                padding: "6px 10px",
+                borderRadius: 8,
+                border: "1px solid #ccc",
+                minWidth: 140,
+              }}
             >
               <option value="fare">Cheapest-first</option>
               <option value="distance">Shortest-distance-first</option>
@@ -324,17 +359,17 @@ const handleFind = () => {
         </div>
       </header>
 
+
       <main className="main">
         <div style={{ position: "absolute", inset: 0 }}>
           {/* ✅ Pass selectedRouteId */}
           <MapView
             stopsCoords={coordsPath}
             useRoadRouting={useRoadRouting}
-            selectedRouteId={selectedRouteId}
           />
         </div>
 
-                {/* ✅ Bottom card now shows multiple routes with stop details */}
+        {/* ✅ Bottom card now shows multiple routes with stop details */}
         <div className="bottom-card">
           {matchingRoutes.length ? (
             <div
@@ -352,108 +387,107 @@ const handleFind = () => {
               <h3 style={{ marginBottom: 8 }}>Available Routes</h3>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 {matchingRoutes.map((route) => {
-  // ✅ Build the full stop sequence
-  const stopNames = [
-    route.from,
-    ...(route.intermediates?.map((i) => i.name) ?? []),
-    route.to,
-  ];
 
-// ✅ Build stop sequence for this specific route
-const routeStops = [
-  route.from,
-  ...(route.intermediates?.map((i) => i.name) ?? []),
-  route.to,
-];
+            // ✅ Build stop sequence for this specific route
+            const routeStops = [
+              route.from,
+              ...(route.intermediates?.map((i) => i.name) ?? []),
+              route.to,
+            ];
 
-// ✅ Build leg segments with fare lookup from local routes[]
-const segments = routeStops.slice(0, -1).map((stop, idx) => {
-  const nextStop = routeStops[idx + 1];
+            // ✅ Build leg segments with fare lookup from local routes[]
+            const segments = routeStops.slice(0, -1).map((stop, idx) => {
+              const nextStop = routeStops[idx + 1];
 
-  // Find all matching routes between stop and nextStop
-  const possibleLegs = routes.filter(
-    (r) => r.from === stop && r.to === nextStop
-  );
+              // Find all matching routes between stop and nextStop
+              const possibleLegs = routes.filter(
+                (r) => r.from === stop && r.to === nextStop
+              );
 
-  // Pick the cheapest fare (or first one if same)
-  const legFare =
-    possibleLegs.length > 0
-      ? Math.min(...possibleLegs.map((r) => r.fare || 0))
-      : 0;
+              // Pick the cheapest fare (or first one if same)
+              const legFare =
+                possibleLegs.length > 0
+                  ? Math.min(...possibleLegs.map((r) => r.fare || 0))
+                  : 0;
 
-  return {
-    from: stop,
-    to: nextStop,
-    fare: legFare,
-  };
-});
+              return {
+                from: stop,
+                to: nextStop,
+                fare: legFare,
+              };
+            });
 
-// ✅ Calculate total fare
-const totalFare = segments.reduce((acc, s) => acc + s.fare, 0);
+            // ✅ Calculate total fare
+              const totalFare = segments.reduce((acc, s) => acc + s.fare, 0);
 
 
-  return (
-    <li
-      key={route.id}
-      onClick={() => {
-        setSelectedRouteId(route.id);
+                return (
+                  <li
+                    key={route.id}
+                    onClick={() => {
+                      setSelectedRouteId(route.id); // keep as string
 
-        const coords: [number, number][] = [];
-        coords.push(route.fromCoords);
-        if (route.intermediates?.length) {
-          coords.push(...route.intermediates.map((i) => i.coords));
-        }
-        coords.push(route.toCoords);
+                      const coords: [number, number][] = [];
+                      coords.push(route.fromCoords);
+                      if (route.intermediates?.length) {
+                        coords.push(...route.intermediates.map((i) => i.coords));
+                      }
+                      coords.push(route.toCoords);
 
-        setCoordsPath(coords);
-      }}
-      style={{
-        padding: "10px",
-        marginBottom: 6,
-        borderRadius: 8,
-        cursor: "pointer",
-        background:
-          route.id === selectedRouteId ? "#f3e8ff" : "#fafafa",
-        border:
-          route.id === selectedRouteId
-            ? "2px solid #6b21a8"
-            : "1px solid #ddd",
-      }}
-    >
-      <div style={{ fontWeight: 700 }}>
-        {route.from} → {route.to}
-      </div>
+                      setCoordsPath(coords);
+                    }}
+                    style={{
+                      padding: "12px",
+                      marginBottom: 8,
+                      borderRadius: 10,
+                      cursor: "pointer",
+                      background:
+                        (route.id) === selectedRouteId ? "#ede9fe" : "#fafafa",
+                      border:
+                        (route.id) === selectedRouteId
+                          ? "2px solid #6b21a8"
+                          : "1px solid #ddd",
+                      boxShadow:
+                        (route.id) === selectedRouteId
+                          ? "0 0 12px rgba(107, 33, 168, 0.4)"
+                          : "none",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <div style={{ fontWeight: 700 }}>
+                      {route.from} → {route.to}
+                    </div>
 
-      {/* ✅ Stops with correct segment fares */}
-      <ul
-        style={{
-          margin: "6px 0",
-          paddingLeft: 16,
-          fontSize: 13,
-          color: "#444",
-        }}
-      >
-        {segments.map((s, idx) => (
-          <li key={idx}>
-            {s.from} → {s.to} —{" "}
-            <span style={{ color: "green" }}>₵{s.fare}</span>
-          </li>
-        ))}
-      </ul>
+                    {/* ✅ Stops with correct segment fares */}
+                    <ul
+                      style={{
+                        margin: "6px 0",
+                        paddingLeft: 16,
+                        fontSize: 13,
+                        color: "#444",
+                      }}
+                    >
+                      {segments.map((s, idx) => (
+                        <li key={idx}>
+                          {s.from} → {s.to} —{" "}
+                          <span style={{ color: "green" }}>₵{s.fare}</span>
+                        </li>
+                      ))}
+                    </ul>
 
-      {/* ✅ Total fare */}
-      <div style={{ marginTop: 6, fontWeight: 600 }}>
-        Total: <span style={{ color: "blue" }}>₵{totalFare}</span>
-      </div>
+                    {/* ✅ Total fare */}
+                    <div style={{ marginTop: 6, fontWeight: 600 }}>
+                      Total: <span style={{ color: "blue" }}>₵{totalFare}</span>
+                    </div>
 
-      {/* Distance + stops count */}
-      <div style={{ fontSize: 12, color: "#555" }}>
-        {route.distance.toFixed(2)} km •{" "}
-        {route.intermediates?.length ?? 0} intermediate stops
-      </div>
-    </li>
-  );
-})}
+                    {/* Distance + stops count */}
+                    <div style={{ fontSize: 12, color: "#555" }}>
+                      {route.distance.toFixed(2)} km •{" "}
+                      {route.intermediates?.length ?? 0} intermediate stops
+                    </div>
+                  </li>
+                );
+              })}
 
               </ul>
             </div>
