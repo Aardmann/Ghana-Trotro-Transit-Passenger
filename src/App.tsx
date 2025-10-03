@@ -144,7 +144,7 @@ useEffect(() => {
 }, [selectedRouteId, matchingRoutes]);
 
 
-  // ✅ Updated find handler
+
 const handleFind = () => {
   if (!from || !to) return;
 
@@ -155,8 +155,6 @@ const handleFind = () => {
       r.to,
     ];
 
-    // ✅ Only include routes where the first stop matches user's "from"
-    // and the last stop matches user's "to"
     return stopSeq[0] === from && stopSeq[stopSeq.length - 1] === to;
   });
 
@@ -194,7 +192,7 @@ const handleFind = () => {
             margin: "0 auto",
             padding: "8px 12px",
             display: "flex",
-            flexDirection: "column", // ✅ stack by default
+            flexDirection: "column", 
             gap: 12,
           }}
         >
@@ -214,7 +212,7 @@ const handleFind = () => {
             className="controls"
             style={{
               display: "flex",
-              flexWrap: "wrap", // ✅ allows wrapping to next line
+              flexWrap: "wrap", 
               gap: 8,
               justifyContent: "center",
             }}
@@ -231,7 +229,7 @@ const handleFind = () => {
                   borderRadius: 8,
                   border: "1px solid #ccc",
                   width: 160,
-                  maxWidth: "40vw", // ✅ shrink on small screens
+                  maxWidth: "40vw", 
                 }}
               />
               {from && (
