@@ -206,7 +206,7 @@ const handleFind = () => {
               textAlign: "center",
             }}
           >
-            Ghana Trotro Transit
+            Ghana Trotro Transitt
           </h1>
 
           {/* Controls */}
